@@ -2,19 +2,19 @@ package main
 
 import (
 	"fmt"
+	"learning-go/basics"
+	"learning-go/concurrent"
+	"learning-go/iopkg"
+	"learning-go/misc"
+	"learning-go/webpkg"
 	"os"
 	"strconv"
-	"learning-go/basics"
-	"learning-go/ioPkg"
-	"learning-go/concurrent"
-	"learning-go/misc"
-	"learning-go/webPkg"
 )
 
 func main() {
 	// This is a single-line comment
 	/* This is a block comment */
-	
+
 	clArgs := os.Args
 	if len(clArgs) < 2 {
 		fmt.Println("No option entered. Exiting program...")
@@ -27,7 +27,7 @@ func main() {
 	// Basics
 	case "variables", "vars":
 		basics.RunVariables()
-	case "arrays": 
+	case "arrays":
 		basics.RunArrays()
 	case "typeAssertions":
 		basics.RunTypeAssertions()
@@ -43,21 +43,19 @@ func main() {
 		fmt.Println(`To import packages from other modules however, the other module needs to be added as
 		a dependency in this module - a require() clause in the go.mod file of this module.`)
 
-
 	// IO
 	case "fileRead", "readFile":
-		ioPkg.RunFileRead()
+		iopkg.RunFileRead()
 	case "fileWrite", "writeFile":
-		ioPkg.RunFileWrite()
+		iopkg.RunFileWrite()
 	case "lineFilter":
-		ioPkg.RunLineFilter()
+		iopkg.RunLineFilter()
 	case "filePaths", "paths":
-		ioPkg.RunFilePaths()
+		iopkg.RunFilePaths()
 	case "directories", "dirs":
-		ioPkg.RunDirectories()
+		iopkg.RunDirectories()
 	case "tmpFileDirs", "tmpFiles", "tmpDirectories", "tmpDirs":
-		ioPkg.RunTmpFilesAndDirectories()
-
+		iopkg.RunTmpFilesAndDirectories()
 
 	// Data-Type specific Utils
 
@@ -97,7 +95,6 @@ func main() {
 	case "statefulGoroutine":
 		concurrent.RunStatefulGoroutine()
 
-	
 	// Miscellaneous
 	case "defer":
 		misc.RunDefer()
@@ -109,7 +106,6 @@ func main() {
 		misc.RunExit()
 	case "envVar":
 		misc.RunEnvVars()
-	
 
 	// Web and Database
 	case "httpClient":
@@ -127,7 +123,7 @@ func main() {
 			fmt.Println("Invalid or Missing arguments.")
 			os.Exit(3)
 		}
-		webPkg.RunHttpClient(method, url, payload)
+		webpkg.RunHttpClient(method, url, payload)
 
 	case "httpServer":
 		serverPort := 8090
@@ -138,7 +134,7 @@ func main() {
 				panic(err)
 			}
 		}
-		webPkg.RunHttpServer(serverPort)
+		webpkg.RunHttpServer(serverPort)
 	case "context", "ctx":
 		serverPort := 8090
 		var err error
@@ -148,9 +144,8 @@ func main() {
 				panic(err)
 			}
 		}
-		webPkg.RunContexts(serverPort)
+		webpkg.RunContexts(serverPort)
 
-	
 	default:
 		fmt.Println("Invalid option. Try again!")
 	}

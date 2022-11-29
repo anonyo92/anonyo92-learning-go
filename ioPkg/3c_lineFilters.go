@@ -1,34 +1,34 @@
-package ioPkg
+package iopkg
 
-/* A line filter is a common type of program that reads input on stdin, processes it, 
+/* A line filter is a common type of program that reads input on stdin, processes it,
  * and then prints some derived result to stdout. grep and sed are common line filters. */
 
 /* Here’s an example line filter in Go that writes a capitalized version of all input text. */
 
 import (
-    "bufio"
-    "fmt"
-    "os"
-    "strings"
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
 )
 
 func RunLineFilter() {
-	/* Wrapping the unbuffered os.Stdin with a buffered scanner gives us 
-	 * a convenient Scan method that advances the scanner to the next token; 
+	/* Wrapping the unbuffered os.Stdin with a buffered scanner gives us
+	 * a convenient Scan method that advances the scanner to the next token;
 	 * which is the next line in the default scanner. */
 	scanner := bufio.NewScanner(os.Stdin)
 
-    for scanner.Scan() {
+	for scanner.Scan() {
 		// Text returns the current token, here the next line, from the input.
-        ucl := strings.ToUpper(scanner.Text())
+		ucl := strings.ToUpper(scanner.Text())
 
 		// Write out the uppercased line.
 		fmt.Println(ucl)
 	}
 
 	// Check for errors during Scan. End of file is expected and not reported by Scan as an error.
-    if err := scanner.Err(); err != nil {
-        fmt.Fprintln(os.Stderr, "error:", err)
-        os.Exit(1)
-    }
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+		os.Exit(1)
+	}
 }

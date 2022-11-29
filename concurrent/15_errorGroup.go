@@ -1,0 +1,5 @@
+package concurrent
+
+func RunErrorGroup() {
+	
+}

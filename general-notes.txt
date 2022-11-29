@@ -1,0 +1,97 @@
+[PROJECT STRUCTURE]
+    1. Single-module project
+    /myapp                      # project-root == repository-root == module-root
+        - go.mod 
+        - go.sum
+        /main                   # main package
+            - main.go           # contains main() function; exec starts here. File-name need not be main.go.
+            - otherSrc.go
+        /helpers                # another package; can export vars/functions to be imported in other packages.
+            - helper01.go
+            - helper02.go
+        /ui
+        /cmd
+        ...
+    
+    2. Multi-module project
+    /myProject                  # project-root == repository-root
+        /app01                  # module-root
+            - go.mod
+            - go.sum
+            /main               # main package for this module
+                - main.go       # contains main() function; exec of this app starts here.
+                - otherSrc01.go
+            /helpers            # another package; can export vars/functions to be imported in other packages.
+                - helper01.go
+                - helper02.go
+
+        /app02                  # module-root
+            - go.mod
+            - go.sum
+            /main               # main package for this module
+                - main.go       # contains main() function; exec of this app starts here.
+                - otherSrc01.go
+            /helpers            # another package; can export vars/functions to be imported in other packages.
+                - helper01.go
+                - helper02.go
+
+        /shared-mod
+            - go.mod
+            - go.sum
+            /helpers            # another package; can export vars/functions to be imported in other packages.
+                - helper01.go
+                - helper02.go
+
+
+[INIT]
+1. Go to your application/module root dir, and initialize it as a go module:
+    > cd myapp
+    > go mod init myapp
+    This will create a go.mod file with module name and go version 
+
+[BUILD]
+    To compile a package and its dependencies, we use:
+        go build 
+
+[RUN]
+1. There must be a main file (conventionally named "main.go", though not necessary) in the "main" package
+    which implements the main() function. This is the entrypoint for the application.
+    There can be only one main package in an application (in a module?)
+    
+        > go run main.go        # compiles (to an executable binary) and runs the program
+
+    Non-main packages cannot be run (even if we define a main() function in it).
+
+Code can be organized into multiple .go files within the same package, and multiple packages in the module.
+
+(I) Single Module :: Single-Package :: Multiple files:
+    a) Functions and variables across multiple .go files within the same package are shareable/accessible.
+        However, while running the application, we need to provide all the dependencies inline like:
+            > go run main.go helper.go validations.go       # similar to JAVA classpath and dependent jars
+    b) If there are many dependent files in a package, we can use the following shorthand 
+        to include all files in the directory containing the main file, as dependencies:
+            > go run .      
+        We need to create a directory for each package (named the same as the package-name),
+            and organize all dependencies (.go files) of that package in the package directory.
+            Only the main package does not need a directory of its own - the main.go can be at the module root.
+
+(II) Single Module :: Multiple-Packages :: Multiple files:
+    a) We can also share code across multiple packages. But for that, we need to:
+        i)  Export the variables/functions from the package where they are defined, 
+            by capitalizing the first letter of their names (like Printf() of the fmt package), and
+        ii) Import the package into the package where these exported code will be used,
+            via the path "<module-name>/<package-name>" like import "myapp/helper", and
+            using them with package-qualified notation like helper.SomeExportedVar, helper.SomeExportedFn(), etc.
+    b) There can only be one "main" package however in a go-module, 
+        and the execution will always begin from the main() function of the "main" package.
+
+(III) Multiple Modules in the app:
+[BACKGROUND: Go Modules]
+    a) Go modules are the official way of dependency-management in Go.
+        A Go module is a collection of related packages and their dependencies versioned together as a single unit.
+        Typically, we have only module in a repository, rooted at the repo-root itself.
+        i)      We can initialize a module using:
+                    > go mod init <module-name>
+                This will generate the go.mod file with the module name and the go version.
+        ii)     We can add dependencies to a module using:
+                    > go get 

@@ -69,7 +69,7 @@
 
 Code can be organized into multiple .go files within the same package, and multiple packages in the module.
 
-(I) Single Module :: Single-Package :: Multiple files:
+(I) Single Module :: Single-Package :: Multiple source files:
     a) Functions and variables across multiple .go files within the same package are shareable/accessible.
         However, while running the application, we need to provide all the dependencies inline like:
             > go run main.go helper.go validations.go       # similar to JAVA classpath and dependent jars
@@ -80,7 +80,7 @@ Code can be organized into multiple .go files within the same package, and multi
             and organize all dependencies (.go files) of that package in the package directory.
             Only the main package does not need a directory of its own - the main.go can be at the module root.
 
-(II) Single Module :: Multiple-Packages :: Multiple files:
+(II) Single Module :: Multiple-Packages :: Multiple source files:
     a) We can also share code across multiple packages. But for that, we need to:
         i)  Export the variables/functions from the package where they are defined, 
             by capitalizing the first letter of their names (like Printf() of the fmt package), and
@@ -90,7 +90,7 @@ Code can be organized into multiple .go files within the same package, and multi
     b) There can only be one "main" package however in a go-module, 
         and the execution will always begin from the main() function of the "main" package.
 
-(III) Multiple Modules in the app:
+(III) Multiple Modules in the project:
     We can also share code from packages across multiple go-modules. But for that, we need to:
         i)      Import the package into our package as usual.
         ii)     Declare the package dependency from the other module in this module's go.mod file.

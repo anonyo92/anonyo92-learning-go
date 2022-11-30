@@ -49,9 +49,14 @@
     > go mod init myapp
     This will create a go.mod file with module name and go version 
 
+[CLEAN]
+    To clean any object files in the current directory left over from previous builds, we use:
+        > go clean
+
 [BUILD]
     To compile a package and its dependencies, we use:
-        go build 
+        > go build 
+    Note: build does not install the results.
 
 [RUN]
 1. There must be a main file (conventionally named "main.go", though not necessary) in the "main" package
@@ -86,12 +91,69 @@ Code can be organized into multiple .go files within the same package, and multi
         and the execution will always begin from the main() function of the "main" package.
 
 (III) Multiple Modules in the app:
-[BACKGROUND: Go Modules]
+    We can also share code from packages across multiple go-modules. But for that, we need to:
+        i)      Import the package into our package as usual.
+        ii)     Declare the package dependency from the other module in this module's go.mod file.
+        iii)    Fetch the dependencies using "go get"
+        iv)     Build and Install the dependencies using "go install"
+    We would create go-modules if we want some packages to be shared across multiple projects.
+    So, we would publish related packages and their dependencies versioned together as a single unit - a go-module.
+
+    [BACKGROUND: Go Modules]
     a) Go modules are the official way of dependency-management in Go.
         A Go module is a collection of related packages and their dependencies versioned together as a single unit.
-        Typically, we have only module in a repository, rooted at the repo-root itself.
-        i)      We can initialize a module using:
+        Typically, we have only 1 module in a repository, rooted at the repo-root itself.
+        i)      We can initialize a directory as a go-module using:
                     > go mod init <module-name>
+                    like, "go mod init example.com/myapp"
                 This will generate the go.mod file with the module name and the go version.
-        ii)     We can add dependencies to a module using:
-                    > go get 
+
+        ii)     DECLARING DEPENDENCIES
+                We can add module dependencies for our module in our module's go.mod file using `require`
+                    like "require (
+                            k8s.io/apimachinery v0.24.2
+                            k8s.io/client-go v0.24.2
+                         )"
+
+        iii)    FETCHING DEPENDENCIES
+                1. We can download dependencies using:
+                    > go get <module-name>/<pkg-name>
+                    like "go get example.com/pkg"
+                    This will check the version specified in the go.mod file in this module directory,
+                    else download the latest version of this dependency (and add it to the go.mod file?).
+                2. To fetch specific versions, add the version after `@` at the end of the dependency, like:
+                    "go get example.com/pkg@v1.2.3"
+                3. To fetch all dependencies of this package, run get without naming any dependency, 
+                    from the package directory:
+                    package-dir> go get .
+                4. To fetch all dependencies declared in the go.mod file for this module, run get without 
+                    naming any dependency, from the module root directory:
+                    module-root> go get .
+                5. Modules are fetched from internet. 
+                    i)  We can configure proxy servers (comma-separated list) in the GOPROXY env variable.
+                    ii) We can configure private servers (comma-separated list) in the GOPRIVATE env variable.
+
+        iv)     INSTALLING DEPENDENCIES
+                go get also builds and installs the dependencies currently, but building and installing
+                packages with get is deprecated, and will in future be only used to adjust dependencies
+                of the current module. For build and install, we use:
+                    > go install example.com/pkg
+                When a version is specified, 'go install' runs in module-aware mode and ignores
+                the go.mod file in the current directory. For example:
+                    > go install example.com/pkg@v1.2.3
+                    > go install example.com/pkg@latest
+
+        v)      TIDYING MODULES
+                    > go mod tidy
+                Tidy makes sure go.mod matches the source code in the module.
+                It adds any missing modules necessary to build the current module's
+                packages and dependencies, and it removes unused modules that
+                don't provide any relevant packages. It also adds any missing entries
+                to go.sum and removes any unnecessary ones.
+
+    b) We can refer to local module on the same filesystem as a dependency of another module
+        by 'replacing' its reference in the go.mod file to the local path, like:
+            require example.com/somemodule v0.0.0-unpublished
+            replace example.com/somemodule v0.0.0-unpublished => ../mylocalmoduleroot
+
+    c) When publishing modules, we need to provide a git tag to be used as our module version.
